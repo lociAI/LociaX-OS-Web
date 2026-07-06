@@ -2,10 +2,10 @@ import { useState, useEffect, useRef } from 'react';
 import './index.css';
 
 function App() {
-  const [activeTab, setActiveTab] = useState('install');
+  const [activeTab, setActiveTab] = useState('prompt');
   const [logs, setLogs] = useState([]);
   const [isInstalling, setIsInstalling] = useState(false);
-  const [promptCategory, setPromptCategory] = useState('Coding - Python Expert');
+  const [promptCategory, setPromptCategory] = useState('Writing - The Blog Generator');
   const [showGlmChat, setShowGlmChat] = useState(false);
   const [chatHistory, setChatHistory] = useState([
     { sender: 'system', text: 'Server Status: Loading Loci AI model weights into VRAM... (This may take several minutes)' },
@@ -16,8 +16,16 @@ function App() {
   const chatEndRef = useRef(null);
   
   const prompts = {
-    "Coding - Python Expert": "System: You are an elite Python software engineer. You specialize in clean, modular, and heavily typed code.\n\nRules:\n- Write production-ready, highly optimized code.\n- Include comprehensive docstrings and type hints (PEP 484).\n- Never use conversational filler like 'Here is your code' or 'Hope this helps'.\n- Always explain your architectural decisions briefly in a comment block at the top.\n\nFormat: Return ONLY the raw code inside a markdown block.\n\nUser: [Insert your coding task here]",
-    "Coding - Code Reviewer": "System: You are a strict, senior security researcher and code reviewer.\n\nRules:\n- Identify any security vulnerabilities, memory leaks, or race conditions.\n- Point out deviations from language-specific style guides (e.g., PEP 8).\n- Be ruthless but constructive. Do not sugarcoat flaws.\n- Propose the optimal fix for every issue identified.\n\nFormat: Provide a bulleted list of issues followed by a unified diff or the corrected code block.\n\nUser: [Insert code here]"
+    "Writing - The Blog Generator": "Act as an expert copywriter. Write a 500-word blog post about the benefits of upgrading to a split system air conditioner before summer. Make the tone engaging, professional, and easy to read. Include a catchy title and a strong call-to-action at the end.",
+    "Writing - Social Media Posts": "I need to post on Facebook and Instagram about a new commercial HVAC installation we just finished. Write 3 different short, punchy captions. Include relevant hashtags and emojis.",
+    "Writing - Writer's Block Buster": "I am writing an 'About Us' page for my mechanical services business, but I'm stuck. Ask me 3 questions about my business, and when I answer them, write a professional 'About Us' bio for me.",
+    "SEO - Web Optimizer": "I have a webpage about 'Ducted Air Conditioning in Perth'. Give me 5 highly clickable SEO title tags (under 60 characters) and 3 meta descriptions (under 160 characters) that will make people want to click on Google.",
+    "Marketing - Ad Copywriter": "Write a short, high-converting Google Ads text for emergency air conditioning repair services. Focus on fast response times and 24/7 availability.",
+    "Marketing - Website Layout Ideas": "I am building a new landing page for commercial refrigeration services. Outline the exact structure I should use from top to bottom (Hero section, Services, Testimonials, etc.) to maximize conversions.",
+    "Professional - The Angry Customer Diffuser": "A customer sent me an angry email complaining that our technician was 30 minutes late due to traffic. Write a polite, de-escalating response apologizing for the delay but remaining professional and firm.",
+    "Professional - Quote Follow-Up": "I sent a quote for a $15,000 commercial VRF installation 3 days ago and haven't heard back. Write a friendly, non-pushy follow-up email to check in and see if they have any questions.",
+    "Editing - The Strict Editor": "Review the following text for spelling, grammar, and flow. Point out any errors and then provide a fully corrected version:\n\n[Paste text]",
+    "Editing - Tone Adjustment": "Rewrite this email to sound more confident and persuasive, rather than passive and uncertain:\n\n[Paste text]"
   };
 
   const handleInstall = () => {
@@ -190,14 +198,10 @@ function App() {
       </div>
       
       <div className="tabs">
-        <button className={`tab ${activeTab === 'install' ? 'active' : ''}`} onClick={() => setActiveTab('install')}>Deploy</button>
-        <button className={`tab ${activeTab === 'prompt' ? 'active' : ''}`} onClick={() => setActiveTab('prompt')}>Prompts</button>
-        <button className={`tab ${activeTab === 'agent' ? 'active' : ''}`} onClick={() => setActiveTab('agent')}>Studio</button>
+        <button className={`tab ${activeTab === 'prompt' ? 'active' : ''}`} onClick={() => setActiveTab('prompt')}>Prompt Library</button>
       </div>
       
-      {activeTab === 'install' && renderInstallTab()}
       {activeTab === 'prompt' && renderPromptTab()}
-      {activeTab === 'agent' && renderMultiAgentTab()}
 
       {/* Loci AI Chat Modal */}
       {showGlmChat && (
