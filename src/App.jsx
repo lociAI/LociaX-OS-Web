@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import './index.css';
 
 function App() {
@@ -6,6 +6,14 @@ function App() {
   const [logs, setLogs] = useState([]);
   const [isInstalling, setIsInstalling] = useState(false);
   const [promptCategory, setPromptCategory] = useState('Coding - Python Expert');
+  const [showGlmChat, setShowGlmChat] = useState(false);
+  const [chatHistory, setChatHistory] = useState([
+    { sender: 'system', text: 'Server Status: Loading GLM model weights into VRAM... (This may take several minutes)' },
+    { sender: 'system', text: 'Server Status: ONLINE (GPU Active)' },
+    { sender: 'system', text: 'Type a message to chat with GLM-5.2...' }
+  ]);
+  const [chatInput, setChatInput] = useState('');
+  const chatEndRef = useRef(null);
   
   const prompts = {
     "Coding - Python Expert": "System: You are an elite Python software engineer. You specialize in clean, modular, and heavily typed code.\n\nRules:\n- Write production-ready, highly optimized code.\n- Include comprehensive docstrings and type hints (PEP 484).\n- Never use conversational filler like 'Here is your code' or 'Hope this helps'.\n- Always explain your architectural decisions briefly in a comment block at the top.\n\nFormat: Return ONLY the raw code inside a markdown block.\n\nUser: [Insert your coding task here]",
@@ -35,6 +43,28 @@ function App() {
       }
     }, 1000);
   };
+
+  const handleChatSubmit = (e) => {
+    e.preventDefault();
+    if (!chatInput.trim()) return;
+    
+    setChatHistory(prev => [...prev, { sender: 'user', text: chatInput }]);
+    const userInput = chatInput;
+    setChatInput('');
+    
+    setTimeout(() => {
+      setChatHistory(prev => [...prev, { 
+        sender: 'glm', 
+        text: `I am GLM-5.2. You said: '${userInput}'. (This is running in the cloud!)` 
+      }]);
+    }, 1000);
+  };
+
+  useEffect(() => {
+    if (chatEndRef.current) {
+      chatEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [chatHistory]);
 
   const renderInstallTab = () => (
     <div className="tab-content">
@@ -78,9 +108,14 @@ function App() {
         ))}
       </div>
       
-      <button className="btn success" onClick={() => navigator.clipboard.writeText(prompts[promptCategory])}>
-        📋 Copy to Clipboard
-      </button>
+      <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
+        <button className="btn success" onClick={() => navigator.clipboard.writeText(prompts[promptCategory])}>
+          📋 Copy to Clipboard
+        </button>
+        <button className="btn primary" onClick={() => setShowGlmChat(true)}>
+          🚀 Launch GLM-5.2 CLI Server
+        </button>
+      </div>
     </div>
   );
 
@@ -144,6 +179,39 @@ function App() {
       {activeTab === 'install' && renderInstallTab()}
       {activeTab === 'prompt' && renderPromptTab()}
       {activeTab === 'agent' && renderMultiAgentTab()}
+
+      {/* GLM Chat Modal */}
+      {showGlmChat && (
+        <div className="modal-overlay">
+          <div className="chat-modal">
+            <div className="chat-header">
+              <h3>LOCIAX OS - GLM-5.2 INTERACTIVE CLI</h3>
+              <button className="close-btn" onClick={() => setShowGlmChat(false)}>✕</button>
+            </div>
+            <div className="chat-window">
+              {chatHistory.map((msg, i) => (
+                <div key={i} className={`chat-message ${msg.sender}`}>
+                  <span className="sender-tag">
+                    {msg.sender === 'user' ? 'User > ' : msg.sender === 'glm' ? 'GLM-5.2 > ' : ''}
+                  </span>
+                  {msg.text}
+                </div>
+              ))}
+              <div ref={chatEndRef} />
+            </div>
+            <form onSubmit={handleChatSubmit} className="chat-input-form">
+              <input 
+                type="text" 
+                value={chatInput}
+                onChange={(e) => setChatInput(e.target.value)}
+                placeholder="Type your message..."
+                autoFocus
+              />
+              <button type="submit" className="btn primary">Send</button>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
