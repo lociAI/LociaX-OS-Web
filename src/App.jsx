@@ -7,6 +7,7 @@ function App() {
   const [isInstalling, setIsInstalling] = useState(false);
   const [promptCategory, setPromptCategory] = useState('Writing - The Blog Generator');
   const [showGlmChat, setShowGlmChat] = useState(false);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [chatHistory, setChatHistory] = useState([
     { sender: 'system', text: 'Server Status: Loading Loci AI model weights into VRAM... (This may take several minutes)' },
     { sender: 'system', text: 'Server Status: ONLINE (GPU Active)' },
@@ -55,6 +56,18 @@ function App() {
   const handleChatSubmit = async (e) => {
     e.preventDefault();
     if (!chatInput.trim()) return;
+    
+    let count = parseInt(localStorage.getItem('loci_msg_count') || '0');
+    let paid = localStorage.getItem('loci_has_paid') === 'true';
+
+    if (count >= 5 && !paid) {
+      setShowPaymentModal(true);
+      return;
+    }
+
+    if (!paid) {
+      localStorage.setItem('loci_msg_count', count + 1);
+    }
     
     setChatHistory(prev => [...prev, { sender: 'user', text: chatInput }]);
     const userInput = chatInput;
@@ -232,6 +245,47 @@ function App() {
               />
               <button type="submit" className="btn primary">Send</button>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Payment Modal */}
+      {showPaymentModal && (
+        <div className="modal-overlay" style={{ zIndex: 1000 }}>
+          <div className="chat-modal" style={{ padding: '2rem', textAlign: 'center', maxWidth: '400px' }}>
+            <h2 style={{ color: '#ff4444' }}>Free Trial Ended</h2>
+            <p>You have used your 5 free messages for this IP address.</p>
+            <p>To continue using Loci AI, please purchase lifetime access for <strong>$39.99</strong>.</p>
+            
+            <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_blank" style={{ margin: '2rem 0' }}>
+              <input type="hidden" name="cmd" value="_xclick" />
+              <input type="hidden" name="business" value="jtechsoftware101@gmail.com" />
+              <input type="hidden" name="item_name" value="Loci AI Lifetime Access" />
+              <input type="hidden" name="amount" value="39.99" />
+              <input type="hidden" name="currency_code" value="USD" />
+              <button type="submit" className="btn success" style={{ width: '100%', fontSize: '1.2rem', padding: '1rem', backgroundColor: '#0070ba', color: 'white' }}>
+                Pay $39.99 via PayPal
+              </button>
+            </form>
+
+            <button 
+              onClick={() => {
+                localStorage.setItem('loci_has_paid', 'true');
+                setShowPaymentModal(false);
+                setChatHistory(prev => [...prev, { sender: 'system', text: 'Payment verified. Thank you for purchasing Loci AI!' }]);
+              }} 
+              style={{ background: 'none', border: 'none', color: '#666', textDecoration: 'underline', cursor: 'pointer', marginTop: '1rem' }}
+            >
+              I have already paid (Unlock)
+            </button>
+            
+            <button 
+              className="close-btn" 
+              onClick={() => setShowPaymentModal(false)}
+              style={{ position: 'absolute', top: '10px', right: '10px', background: 'none', border: 'none', fontSize: '1.5rem', cursor: 'pointer' }}
+            >
+              ✕
+            </button>
           </div>
         </div>
       )}
