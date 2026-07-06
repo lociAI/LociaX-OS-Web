@@ -8,9 +8,9 @@ function App() {
   const [promptCategory, setPromptCategory] = useState('Coding - Python Expert');
   const [showGlmChat, setShowGlmChat] = useState(false);
   const [chatHistory, setChatHistory] = useState([
-    { sender: 'system', text: 'Server Status: Loading GLM model weights into VRAM... (This may take several minutes)' },
+    { sender: 'system', text: 'Server Status: Loading Loci AI model weights into VRAM... (This may take several minutes)' },
     { sender: 'system', text: 'Server Status: ONLINE (GPU Active)' },
-    { sender: 'system', text: 'Type a message to chat with GLM-5.2...' }
+    { sender: 'system', text: 'Type a message to chat with Loci AI...' }
   ]);
   const [chatInput, setChatInput] = useState('');
   const chatEndRef = useRef(null);
@@ -22,12 +22,12 @@ function App() {
 
   const handleInstall = () => {
     setIsInstalling(true);
-    setLogs(["Starting GLM-5.2 Cloud Provisioning..."]);
+    setLogs(["Starting Loci AI Cloud Provisioning..."]);
     
     let step = 0;
     const steps = [
       "Allocating GPU container...",
-      "Cloning GLM-5.2 repository...",
+      "Cloning Loci AI repository...",
       "Setting up Python virtual environment...",
       "Installing PyTorch and dependencies...",
       "Provisioning successful! Your server is ready."
@@ -81,7 +81,7 @@ function App() {
   const renderInstallTab = () => (
     <div className="tab-content">
       <h2>Provision Server</h2>
-      <p>Deploy your dedicated GLM-5.2 environment to our secure cloud. This will allocate an instance for you.</p>
+      <p>Deploy your dedicated Loci AI environment to our secure cloud. This will allocate an instance for you.</p>
       
       <button 
         className="btn primary" 
@@ -125,7 +125,7 @@ function App() {
           📋 Copy to Clipboard
         </button>
         <button className="btn primary" onClick={() => setShowGlmChat(true)}>
-          🚀 Launch GLM-5.2 CLI Server
+          🚀 Launch Loci AI CLI Server
         </button>
       </div>
     </div>
@@ -162,7 +162,7 @@ function App() {
           <div className="form-group">
             <label>Reward Mechanism</label>
             <select className="form-control">
-              <option>GLM-5.2 (Self-Critique)</option>
+              <option>Loci AI (Self-Critique)</option>
               <option>Heuristic</option>
             </select>
           </div>
@@ -199,19 +199,19 @@ function App() {
       {activeTab === 'prompt' && renderPromptTab()}
       {activeTab === 'agent' && renderMultiAgentTab()}
 
-      {/* GLM Chat Modal */}
+      {/* Loci AI Chat Modal */}
       {showGlmChat && (
         <div className="modal-overlay">
           <div className="chat-modal">
             <div className="chat-header">
-              <h3>LOCIAX OS - GLM-5.2 INTERACTIVE CLI</h3>
+              <h3>LOCIAX OS - Loci AI INTERACTIVE CLI</h3>
               <button className="close-btn" onClick={() => setShowGlmChat(false)}>✕</button>
             </div>
             <div className="chat-window">
               {chatHistory.map((msg, i) => (
                 <div key={i} className={`chat-message ${msg.sender}`}>
                   <span className="sender-tag">
-                    {msg.sender === 'user' ? 'User > ' : msg.sender === 'glm' ? 'GLM-5.2 > ' : ''}
+                    {msg.sender === 'user' ? 'User > ' : msg.sender === 'glm' ? 'Loci AI > ' : ''}
                   </span>
                   {msg.text}
                 </div>
@@ -236,3 +236,4 @@ function App() {
 }
 
 export default App;
+
