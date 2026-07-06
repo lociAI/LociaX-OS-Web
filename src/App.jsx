@@ -44,7 +44,9 @@ function App() {
     }, 1000);
   };
 
-  const handleChatSubmit = (e) => {
+  const [apiKey, setApiKey] = useState('');
+
+  const handleChatSubmit = async (e) => {
     e.preventDefault();
     if (!chatInput.trim()) return;
     
@@ -52,12 +54,37 @@ function App() {
     const userInput = chatInput;
     setChatInput('');
     
-    setTimeout(() => {
-      setChatHistory(prev => [...prev, { 
-        sender: 'glm', 
-        text: `I am GLM-5.2. You said: '${userInput}'. (This is running in the cloud!)` 
-      }]);
-    }, 1000);
+    if (!apiKey) {
+      setTimeout(() => {
+        setChatHistory(prev => [...prev, { 
+          sender: 'system', 
+          text: 'Error: Please enter your Google Gemini API Key in the box below to enable the AI.' 
+        }]);
+      }, 500);
+      return;
+    }
+
+    try {
+      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: `You are an AI named GLM-5.2. Reply to this: ${userInput}` }] }]
+        })
+      });
+      
+      const data = await response.json();
+      
+      if (data.error) {
+        setChatHistory(prev => [...prev, { sender: 'system', text: `API Error: ${data.error.message}` }]);
+        return;
+      }
+      
+      const botReply = data.candidates[0].content.parts[0].text;
+      setChatHistory(prev => [...prev, { sender: 'glm', text: botReply }]);
+    } catch (error) {
+      setChatHistory(prev => [...prev, { sender: 'system', text: `Network Error: ${error.message}` }]);
+    }
   };
 
   useEffect(() => {
@@ -205,6 +232,15 @@ function App() {
                 </div>
               ))}
               <div ref={chatEndRef} />
+            </div>
+            <div style={{ padding: '0 1rem', display: 'flex', gap: '1rem', borderTop: '1px solid #1e293b', paddingTop: '1rem' }}>
+              <input 
+                type="password" 
+                value={apiKey}
+                onChange={(e) => setApiKey(e.target.value)}
+                placeholder="Paste your Gemini API Key here..."
+                style={{ flex: 1, background: 'rgba(0,0,0,0.5)', border: '1px solid #1e293b', padding: '0.75rem 1rem', borderRadius: '8px', color: 'white', fontFamily: 'inherit' }}
+              />
             </div>
             <form onSubmit={handleChatSubmit} className="chat-input-form">
               <input 
