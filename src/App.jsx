@@ -165,9 +165,16 @@ function App() {
 
   return (
     <div className="app-container">
-      <div className="header">
+      <div className="header" style={{ position: 'relative' }}>
         <h1>LociaX OS</h1>
         <p>SaaS Cloud Edition</p>
+        <button 
+          className="btn primary" 
+          style={{ position: 'absolute', top: '2rem', right: '2rem' }}
+          onClick={() => setShowGlmChat(true)}
+        >
+          🚀 Launch AI Now
+        </button>
       </div>
       
       <div className="tabs">
